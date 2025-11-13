@@ -1,3 +1,11 @@
-//
-// Created by HASNEM on 13/11/2025.
-//
+#include <stdio.h>
+#include "partie_B/recherche_utilisateur.h"
+
+int main() {
+    BaseUtilisateurs base;
+    base.nbUtilisateurs = 0;
+
+    menu(&base);
+
+    return 0;
+}
