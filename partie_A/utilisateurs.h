@@ -34,5 +34,4 @@ StatutUtilisateur ajouterUtilisateur(BaseUtilisateurs *base, Utilisateur u);
 StatutUtilisateur modifierUtilisateur(BaseUtilisateurs *base, UpdateUtilisateur upd);
 StatutUtilisateur supprimerUtilisateurParID(BaseUtilisateurs *base, int id);
 
-#endif
-ILISATEURS_H
+#endif // UTILISATEURS_H

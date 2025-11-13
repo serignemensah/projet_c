@@ -190,4 +190,3 @@ void menu(BaseUtilisateurs *base) {
     } while (choix != 0);
     printf("👋 Fin du programme.\n");
 }
-de "recherche_utilisateur.h"

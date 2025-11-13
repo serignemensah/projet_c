@@ -1,6 +1,3 @@
-
-
-#endif //PROJET_C_RECHERCHE_UTILISATEUR_H
 #ifndef RECHERCHE_UTILISATEUR_H
 #define RECHERCHE_UTILISATEUR_H
 
@@ -16,4 +13,4 @@ void afficherUtilisateursTriesParNom(BaseUtilisateurs *base);
 void afficherUtilisateursTriesParID(BaseUtilisateurs *base);
 void menu(BaseUtilisateurs *base);
 
-#endif
+#endif // RECHERCHE_UTILISATEUR_H
