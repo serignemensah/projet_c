@@ -12,5 +12,8 @@ void afficherUtilisateurs(BaseUtilisateurs *base);
 void afficherUtilisateursTriesParNom(BaseUtilisateurs *base);
 void afficherUtilisateursTriesParID(BaseUtilisateurs *base);
 void menu(BaseUtilisateurs *base);
+// Persistance
+StatutUtilisateur sauvegarderUtilisateurs(BaseUtilisateurs *base, const char *filename);
+StatutUtilisateur chargerUtilisateurs(BaseUtilisateurs *base, const char *filename);
 
 #endif // RECHERCHE_UTILISATEUR_H
