@@ -1,0 +1,9 @@
+111|Test|Moi|2024|Roman|0
+978-2266127883|Le Petit Prince|Antoine de Saint-Exupéry|1943|Conte|0
+978-0131103627|The C Programming Language|Kernighan & Ritchie|1978|Informatique|0
+978-0544003415|The Lord of the Rings|J.R.R. Tolkien|1954|Fantasy|1
+978-0439785969|Harry Potter|J.K. Rowling|1997|Fantasy|0
+333|TR|OI|2013|JU|0
+USHNBN|PLUS RIEN|DAVID|2011|DEVELOPPE|0
+978-0131103621|Sport + sport|Anis |2025|Sport|0
+12345|Sport|Anis|2025|Sport|0
