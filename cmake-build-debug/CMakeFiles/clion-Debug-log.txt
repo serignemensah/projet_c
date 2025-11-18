@@ -1,1 +1,0 @@
-CMakeLists.txt not found in /Users/crite/CLionProjects/projet_c/projet_c Select CMakeLists.txt
