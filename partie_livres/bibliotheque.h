@@ -21,7 +21,6 @@ typedef enum {
     LIVRE_HORS_SERVICE
     } Disponibilite;
 
-/* Codes de statut / erreur pour les opérations */
 typedef enum {
     STATUT_OK = 0,
     STATUT_DOUBLON_ISBN,
@@ -29,7 +28,10 @@ typedef enum {
     STATUT_ENTREE_INVALIDE,
     STATUT_PLEIN,
     STATUT_MEMOIRE,
-    STATUT_INTERNE
+    STATUT_INTERNE,
+    // 🆕 pour les emprunts
+    STATUT_LIVRE_INEXISTANT,
+    STATUT_PLUS_DISPONIBLE
     } StatutLivre;
 
 /* Modèle principal d'un livre */
@@ -39,8 +41,13 @@ typedef struct {
     char auteur[AUTEUR_LEN];
     int annee; /* ex: 1450..2100 */
     char categorie[CATEGORIE_LEN]; /* ex: "Roman", "Informatique" */
-    Disponibilite dispo;
+    Disponibilite dispo; /* état global : dispo, perdu, HS, etc. */
+
+    // 🆕 gestion des exemplaires
+    int nb_exemplaires_total; /* nb d'exemplaires possédés */
+    int nb_exemplaires_disponibles;/* nb d'exemplaires actuellement dispo */
 } Livre;
+
 
 /* Masques de mise à jour partielle pour UpdateLivre.mask */
 enum {
@@ -79,6 +86,15 @@ StatutLivre initBibliotheque(Bibliotheque *b);
 StatutLivre sauvegarderBibliotheque(const Bibliotheque *b, const char *filename);
 
 StatutLivre chargerBibliotheque(Bibliotheque *b, const char *filename);
+
+int getNbExemplairesDisponibles(const Bibliotheque *b, const char *isbn);
+StatutLivre emprunterExemplaire(Bibliotheque *b, const char *isbn);
+StatutLivre retournerExemplaire(Bibliotheque *b, const char *isbn);
+
+
+void afficherEnteteTable();
+void afficherTousLesLivresTable(const Bibliotheque *b);
+StatutLivre sauvegarderBibliothequeTable(const Bibliotheque *b, const char *filename);
 
 void freeBibliotheque(Bibliotheque *b);
 #endif /* BIBLIOTHEQUE_H */

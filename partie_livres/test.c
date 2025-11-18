@@ -5,7 +5,7 @@
 #include "test.h"
 #include <stdio.h>
 #include <string.h>
-#include "bibliothèque.h"
+#include "bibliotheque.h"
 #include "recherche.h"
 
 // Déclarations des fonctions CRUD (si pas déjà dans un .h)

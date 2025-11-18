@@ -4,8 +4,8 @@ project(ProjetInfo C)
 set(CMAKE_C_STANDARD 11)
 
 add_executable(ProjetInfo main.c
-        partie_livres/bibliothèque.c
-        partie_livres/bibliothèque.h
+        partie_livres/bibliotheque.c
+        partie_livres/bibliotheque.h
         partie_livres/recherche.c
         partie_livres/recherche.h
         partie_livres/test.c
