@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <string.h>
-#include "partie_livres/bibliothèque.h"
+#include "partie_livres/bibliotheque.h"
 #include "partie_livres/recherche.h"
 #include "partie_livres/test.h"
 #include "partie_livres/statistiques.h"

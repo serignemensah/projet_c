@@ -4,7 +4,7 @@
 
 #ifndef RECHERCHE_H
 #define RECHERCHE_H
-#include "bibliothèque.h"
+#include "bibliotheque.h"
 
 void rechercherLivreParTitre(const Bibliotheque *b, const char *titre);
 void rechercherLivreParAuteur(const Bibliotheque *b, const char *auteur);

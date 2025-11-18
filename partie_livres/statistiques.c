@@ -4,7 +4,7 @@
 
 #include "statistiques.h"
 #include <stdio.h>
-#include"bibliothèque.h"
+#include"bibliotheque.h"
 #include <string.h>
 #include <time.h>
 int compterTotalLivres(const Bibliotheque *b) {
