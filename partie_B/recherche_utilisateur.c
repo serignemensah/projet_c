@@ -117,7 +117,7 @@ void afficherUtilisateursTriesParID(BaseUtilisateurs *base) {
 }
 
 // Menu principal
-void menu(BaseUtilisateurs *base) {
+void menu_recherche(BaseUtilisateurs *base) {
     int choix;
     do {
         printf("\n===== MENU GESTION UTILISATEURS =====\n");

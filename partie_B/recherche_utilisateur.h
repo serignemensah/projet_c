@@ -11,7 +11,7 @@ void rechercherUtilisateurParNom(BaseUtilisateurs *base, const char *nom);
 void afficherUtilisateurs(BaseUtilisateurs *base);
 void afficherUtilisateursTriesParNom(BaseUtilisateurs *base);
 void afficherUtilisateursTriesParID(BaseUtilisateurs *base);
-void menu(BaseUtilisateurs *base);
+void menu_recherhe(BaseUtilisateurs *base);
 // Persistance
 StatutUtilisateur sauvegarderUtilisateurs(BaseUtilisateurs *base, const char *filename);
 StatutUtilisateur chargerUtilisateurs(BaseUtilisateurs *base, const char *filename);
