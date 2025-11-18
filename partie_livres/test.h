@@ -4,8 +4,8 @@
 
 #ifndef TEST_H
 #define TEST_H
-test_ajout();
-test_suppression();
-test_modification();
-test_recherche();
+int  test_ajout();
+int  test_suppression();
+int  test_modification();
+int  test_recherche();
 #endif //TEST_H
