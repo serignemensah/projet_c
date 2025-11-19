@@ -9,7 +9,41 @@
 StatutLivre ajouterLivre(Bibliotheque *b, const Livre *l);
 void freeBibliotheque(Bibliotheque *b);
 
+void afficherMenuPrincipal() {
+    printf("\n========= MENU PRINCIPAL =========\n");
+    printf(" 1. Gestion de la Bibliothèque\n");
+    printf(" 2. Gestion des Livres\n");
+    printf(" 0. Quitter\n");
+    printf("----------------------------------\n");
+    printf("Votre choix : ");
+}
+void demarrerMenuPrincipal(Bibliotheque *b) {
+    int choix;
 
+    do {
+        afficherMenuPrincipal();
+        scanf("%d", &choix);
+        getchar();
+
+        switch (choix) {
+            case 1:
+                demarrerMenuBibliotheque(b);
+                break;
+
+            case 2:
+                demarrerMenuLivres(b);
+                break;
+
+            case 0:
+                printf("Fermeture...\n");
+                break;
+
+            default:
+                printf("Choix invalide.\n");
+        }
+
+    } while (choix != 0);
+}
 void menu() {
     printf("\n========================================\n");
     printf("           GESTION BIBLIOTHEQUE\n");
