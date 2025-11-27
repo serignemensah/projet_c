@@ -12,8 +12,6 @@ add_executable(ProjetInfo main.c
         partie_livres/test.h
         partie_livres/statistiques.c
         partie_livres/statistiques.h
-        partie_A/utilisateurs.h
-        partie_A/utilisateurs.c
-        partie_B/recherche_utilisateur.c
-        partie_B/recherche_utilisateur.h
+        partie_livres/utilisateur.c
+        partie_livres/utilisateur.h
 )

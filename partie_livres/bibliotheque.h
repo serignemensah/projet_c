@@ -96,6 +96,10 @@ void afficherEnteteTable();
 void afficherTousLesLivresTable(const Bibliotheque *b);
 StatutLivre sauvegarderBibliothequeTable(const Bibliotheque *b, const char *filename);
 
+
+void menu_livres(Bibliotheque* b);
+
+
 void freeBibliotheque(Bibliotheque *b);
 #endif /* BIBLIOTHEQUE_H */
 
