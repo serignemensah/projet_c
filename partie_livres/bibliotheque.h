@@ -1,11 +1,8 @@
-#ifndef GESTION_LIVRE_BIBLIOTHÈQUE_H
-#define GESTION_LIVRE_BIBLIOTHÈQUE_H
+
 #ifndef BIBLIOTHEQUE_H
 #define BIBLIOTHEQUE_H
-
 #include <stdbool.h>
 #include <stddef.h>
-
 /* Tailles maximales (incluent le '\0') */
 #define ISBN_LEN 18 /* ex: "978-2-07-036822-8" */
 #define TITRE_LEN 128
@@ -46,6 +43,8 @@ typedef struct {
     // 🆕 gestion des exemplaires
     int nb_exemplaires_total; /* nb d'exemplaires possédés */
     int nb_exemplaires_disponibles;/* nb d'exemplaires actuellement dispo */
+    int nb_Emprunts;
+
 } Livre;
 
 
@@ -98,9 +97,9 @@ StatutLivre sauvegarderBibliothequeTable(const Bibliotheque *b, const char *file
 
 
 void menu_livres(Bibliotheque* b);
+StatutLivre setDisponibiliteLivre(Bibliotheque *b, const char *isbn, Disponibilite d);
 
 
 void freeBibliotheque(Bibliotheque *b);
 #endif /* BIBLIOTHEQUE_H */
 
-#endif //GESTION_LIVRE_BIBLIOTHÈQUE_H

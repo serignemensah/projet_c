@@ -45,6 +45,8 @@ void rechercherLivreParISBN(const Bibliotheque *b, const char *isbn) {
                    b->livres[i].auteur,
                    b->livres[i].annee,
                    b->livres[i].categorie);
+
+
             return;
         }
     }
@@ -160,7 +162,7 @@ void afficherDisponibiliteLivre(const Bibliotheque *b, const char *isbn) {
     printf(" Aucun livre avec l'ISBN '%s'\n", isbn);
 }
 
-StatutLivre setDisponibiliteLivre(Bibliotheque *b, const char *isbn, Disponibilite d) {
+StatutLivre setDisponibiliteLivre(Bibliotheque* b, const char *isbn, Disponibilite d) {
     for (size_t i = 0; i < b->nb; i++) {
         if (strcmp(b->livres[i].isbn, isbn) == 0) {
             b->livres[i].dispo = d;

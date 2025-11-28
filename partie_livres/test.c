@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "recherche.h"
-#include "bibliotheque.h"
+
 
 // Déclarations des fonctions CRUD (si pas déjà dans un .h)
 StatutLivre initBibliotheque(Bibliotheque *b);

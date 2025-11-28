@@ -1,91 +1,41 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include "partie_livres/bibliotheque.h"
-#include "partie_livres/recherche.h"
-#include "partie_livres/test.h"
-#include "partie_livres/statistiques.h"
-#include"partie_livres/utilisateur.h"
-#include"partie_livres/emprunt.h"
+#include "partie_livres/emprunt.h"
+#include "partie_livres/utilisateur.h"
+#include <stdlib.h>
+int main() {
 
-
-void menu_principal(void) {
-
-}
-
-int main(void) {
-    Bibliotheque b = {0};
-    BaseUtilisateurs base = {0};
-    BaseEmprunts base_emprunts = { .nbEmprunts = 0 };
+    Bibliotheque b;
+    BaseUtilisateurs bu;
+    BaseEmprunts be;
 
     initBibliotheque(&b);
-    chargerBibliotheque(&b, "livres_table.txt");
+    bu.nbUtilisateurs = 0;
+    be.nbEmprunts = 0;
 
-    // Charger utilisateurs
-    chargerUtilisateurs(&base, "test_utilisateurs.csv");
+    chargerToutesDonnees(&b, &bu, &be);
 
-    int choix = 20;
+    int choix;
 
     do {
-        printf("\n========================================\n");
-        printf("           MENU PRINCIPAL\n");
-        printf("========================================\n");
-        printf(" 1. Gestion des livres\n");
-        printf(" 2. Gestion des utilisateurs\n");
-        printf(" 3. Gestion des emprunts\n");
-        printf(" 0. Quitter\n");
-        printf("----------------------------------------\n");
-        printf("Votre choix : ");
-
-        if (scanf("%d", &choix) != 1) {
-            int c;
-            while ((c = getchar()) != '\n' && c != EOF) {}
-            printf("Entree invalide.\n");
-            continue;
-        }
-        getchar(); // consomme \n
+        printf("\n===== MENU PRINCIPAL =====\n");
+        printf("1. Gestion des utilisateurs\n");
+        printf("2. Gestion des livres\n");
+        printf("3. Gestion des emprunts\n");
+        printf("0. Quitter\n");
+        printf("Choix : ");
+        scanf("%d", &choix);
 
         switch (choix) {
-
-        case 1:
-            menu_livres(&b);
-            break;
-
-        case 2:
-            menu_recherche(&base);
-            break;
-
-            case 3:
-                afficherMenuEmprunt(&base_emprunts);
-              break;
-        case 0:
-            printf("Au revoir !\n");
-            sauvegarderBibliothequeTable(&b, "livres_table.txt");
-            sauvegarderUtilisateurs(&base, "test_utilisateurs.csv");
-            sauvegarderEmprunts(&base_emprunts,"test_emprunts.csv");
-            break;
-
-        default:
-            printf("Choix invalide.\n");
+            case 1: menu_recherche(&bu); break;
+            case 2: menu_livres(&b); break;
+            case 3: afficherMenuEmprunt(&b, &bu, &be); break;
         }
 
     } while (choix != 0);
 
-    freeBibliotheque(&b);
+    sauvegarderToutesDonnees(&b, &bu, &be);
+    free(b.livres);
+
     return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

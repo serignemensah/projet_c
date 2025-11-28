@@ -1,61 +1,78 @@
-//
+// utilisateur.c
 // Created by marie on 27/11/2025.
-//
 
-#include "utilisateur.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <errno.h>
+#include "emprunt.h"
+#include "utilisateur.h"
+#include "bibliotheque.h"
 
+/* forward declaration (pour que les fonctions de sauvegarde globale compilent
+   même si tu n'as pas encore fourni emprunt.h) */
 
+/* ---------- helpers ---------- */
 
-// Conversion en minuscules
+/* Conversion en minuscules (in-place) */
 void toLowerCase(char *str) {
-    for (int i = 0; str[i]; i++)
-        str[i] = tolower((unsigned char)str[i]);
+    for (size_t i = 0; str[i]; ++i)
+        str[i] = (char)tolower((unsigned char)str[i]);
 }
 
-// Suppression des espaces superflus et du \n
-void trim(char *str) {
-    char *end;
-    while (isspace((unsigned char)*str)) str++;
-    if (*str == 0) return;
-    end = str + strlen(str) - 1;
-    while (end > str && isspace((unsigned char)*end)) end--;
-    *(end + 1) = '\0';
+/* trim in-place : supprime espaces en début et fin */
+void trim(char *s) {
+    if (!s || *s == '\0') return;
+
+    // supprimer espaces de début
+    char *start = s;
+    while (*start && isspace((unsigned char)*start)) start++;
+
+    // déplacer le contenu vers le début si besoin
+    if (start != s) memmove(s, start, strlen(start) + 1);
+
+    // supprimer espaces de fin
+    size_t len = strlen(s);
+    while (len > 0 && isspace((unsigned char)s[len - 1])) {
+        s[len - 1] = '\0';
+        --len;
+    }
 }
 
-// Recherche par ID
+/* ---------- recherches / affichage ---------- */
+
 Utilisateur* rechercherUtilisateurParID(BaseUtilisateurs *base, int id) {
-    for (int i = 0; i < base->nbUtilisateurs; i++) {
-        if (base->utilisateurs[i].id == id)
-            return &base->utilisateurs[i];
+    if (!base) return NULL;
+    for (int i = 0; i < base->nbUtilisateurs; ++i) {
+        if (base->utilisateurs[i].id == id) return &base->utilisateurs[i];
     }
     return NULL;
 }
 
-// Recherche par email exact
 Utilisateur* rechercherUtilisateurParEmail(BaseUtilisateurs *base, const char *email) {
-    for (int i = 0; i < base->nbUtilisateurs; i++) {
-        if (strcmp(base->utilisateurs[i].email, email) == 0)
-            return &base->utilisateurs[i];
+    if (!base || !email) return NULL;
+    for (int i = 0; i < base->nbUtilisateurs; ++i) {
+        if (strcmp(base->utilisateurs[i].email, email) == 0) return &base->utilisateurs[i];
     }
     return NULL;
 }
 
-// Recherche par sous-chaîne de nom
 void rechercherUtilisateurParNom(BaseUtilisateurs *base, const char *nom) {
-    char nomRecherche[100];
-    strcpy(nomRecherche, nom);
-    toLowerCase(nomRecherche);
-    int trouve = 0;
+    if (!base || !nom) return;
+    char recherche[256];
+    strncpy(recherche, nom, sizeof(recherche)-1);
+    recherche[sizeof(recherche)-1] = '\0';
+    trim(recherche);
+    toLowerCase(recherche);
 
-    for (int i = 0; i < base->nbUtilisateurs; i++) {
-        char nomActuel[100];
-        strcpy(nomActuel, base->utilisateurs[i].nom);
-        toLowerCase(nomActuel);
-        if (strstr(nomActuel, nomRecherche)) {
+    int trouve = 0;
+    for (int i = 0; i < base->nbUtilisateurs; ++i) {
+        char tmp[256];
+        strncpy(tmp, base->utilisateurs[i].nom, sizeof(tmp)-1);
+        tmp[sizeof(tmp)-1] = '\0';
+        toLowerCase(tmp);
+        if (strstr(tmp, recherche) != NULL) {
             printf("ID: %d | %s %s | %s\n",
                    base->utilisateurs[i].id,
                    base->utilisateurs[i].prenom,
@@ -64,19 +81,17 @@ void rechercherUtilisateurParNom(BaseUtilisateurs *base, const char *nom) {
             trouve = 1;
         }
     }
-    if (!trouve)
-        printf("Aucun utilisateur trouvé pour le nom : %s\n", nom);
+    if (!trouve) printf("Aucun utilisateur trouvé pour le nom : %s\n", nom);
 }
 
-// Affichage de tous les utilisateurs
 void afficherUtilisateurs(BaseUtilisateurs *base) {
-    if (base->nbUtilisateurs == 0) {
+    if (!base || base->nbUtilisateurs == 0) {
         printf("Aucun utilisateur enregistré.\n");
         return;
     }
     printf("\n%-5s | %-15s | %-15s | %-25s\n", "ID", "Nom", "Prénom", "E-mail");
     printf("-----------------------------------------------------------------------\n");
-    for (int i = 0; i < base->nbUtilisateurs; i++) {
+    for (int i = 0; i < base->nbUtilisateurs; ++i) {
         printf("%-5d | %-15s | %-15s | %-25s\n",
                base->utilisateurs[i].id,
                base->utilisateurs[i].nom,
@@ -85,176 +100,71 @@ void afficherUtilisateurs(BaseUtilisateurs *base) {
     }
 }
 
-// Tri par nom
-int comparerParNom(const void *a, const void *b) {
-    const Utilisateur *u1 = (const Utilisateur *)a;
-    const Utilisateur *u2 = (const Utilisateur *)b;
-
+/* tri helpers */
+static int comparerParNom(const void *a, const void *b) {
+    const Utilisateur *u1 = a;
+    const Utilisateur *u2 = b;
     int cmp = strcmp(u1->nom, u2->nom);
-    if (cmp == 0)
-        cmp = strcmp(u1->prenom, u2->prenom);
+    if (cmp == 0) cmp = strcmp(u1->prenom, u2->prenom);
     return cmp;
 }
-
-// Tri par ID
-int comparerParID(const void *a, const void *b) {
-    const Utilisateur *u1 = (const Utilisateur *)a;
-    const Utilisateur *u2 = (const Utilisateur *)b;
-    return u1->id - u2->id;
+static int comparerParID(const void *a, const void *b) {
+    const Utilisateur *u1 = a;
+    const Utilisateur *u2 = b;
+    return (u1->id - u2->id);
 }
 
 void afficherUtilisateursTriesParNom(BaseUtilisateurs *base) {
-    if (base->nbUtilisateurs == 0) {
-        printf("Aucun utilisateur à trier.\n");
-        return;
-    }
+    if (!base || base->nbUtilisateurs == 0) { printf("Aucun utilisateur à trier.\n"); return; }
     qsort(base->utilisateurs, base->nbUtilisateurs, sizeof(Utilisateur), comparerParNom);
     afficherUtilisateurs(base);
 }
-
 void afficherUtilisateursTriesParID(BaseUtilisateurs *base) {
-    if (base->nbUtilisateurs == 0) {
-        printf("Aucun utilisateur à trier.\n");
-        return;
-    }
+    if (!base || base->nbUtilisateurs == 0) { printf("Aucun utilisateur à trier.\n"); return; }
     qsort(base->utilisateurs, base->nbUtilisateurs, sizeof(Utilisateur), comparerParID);
     afficherUtilisateurs(base);
 }
 
-// Menu principal
-void menu_recherche(BaseUtilisateurs *base) {
-    int choix;
-    do {
-        printf("\n===== MENU GESTION UTILISATEURS =====\n");
-        printf("1. Ajouter un utilisateur\n");
-        printf("2. Modifier un utilisateur\n");
-        printf("3. Supprimer un utilisateur\n");
-        printf("4. Rechercher un utilisateur par nom\n");
-        printf("5. Lister tous les utilisateurs\n");
-        printf("6. Lister triés par nom\n");
-        printf("7. Lister triés par ID\n");
-        printf("8 sauvegardde\n");
-        printf("9 Charger\n");
-        printf("0. Quitter\n");
-        printf("Votre choix : ");
-        scanf("%d", &choix);
-        getchar(); // éviter le \n
-        if (choix == 1) {
-            Utilisateur u;
-            printf("ID : ");
-            scanf("%d", &u.id); getchar();
-            printf("Nom : "); fgets(u.nom, sizeof(u.nom), stdin); trim(u.nom);
-            printf("Prénom : "); fgets(u.prenom, sizeof(u.prenom), stdin); trim(u.prenom);
-            printf("Email : "); fgets(u.email, sizeof(u.email), stdin); trim(u.email);
+/* ---------- opérations CRUD sur utilisateurs ---------- */
 
-            StatutUtilisateur status = ajouterUtilisateur(base, u);
-            if (status == OK) printf("✅ Utilisateur ajouté.\n");
-            else printf("❌ Erreur (code %d).\n", status);
-        }
-
-        else if (choix == 2) {
-            int id;
-            printf("ID à modifier : "); scanf("%d", &id); getchar();
-            Utilisateur *u = rechercherUtilisateurParID(base, id);
-            if (!u) { printf("Utilisateur introuvable.\n"); continue; }
-
-            UpdateUtilisateur upd = {id, "", "", ""};
-
-            printf("Nouveau nom (%s) : ", u->nom);
-            fgets(upd.nom, sizeof(upd.nom), stdin); trim(upd.nom);
-
-            printf("Nouveau prénom (%s) : ", u->prenom);
-            fgets(upd.prenom, sizeof(upd.prenom), stdin); trim(upd.prenom);
-
-            printf("Nouvel email (%s) : ", u->email);
-            fgets(upd.email, sizeof(upd.email), stdin); trim(upd.email);
-
-            StatutUtilisateur s = modifierUtilisateur(base, upd);
-            if (s == OK) printf(" Modifié avec succès.\n");
-            else printf(" Erreur (code %d).\n", s);
-        }
-
-        else if (choix == 3) {
-            int id;
-            printf("ID à supprimer : ");
-            scanf("%d", &id); getchar();
-            StatutUtilisateur s = supprimerUtilisateurParID(base, id);
-            if (s == OK) printf(" Supprimé.\n");
-            else printf(" Erreur (code %d).\n", s);
-        }
-
-        else if (choix == 4) {
-            char nom[100];
-            printf("Nom à rechercher : ");
-            fgets(nom, sizeof(nom), stdin);
-            trim(nom);
-            rechercherUtilisateurParNom(base, nom);
-        }
-
-        else if (choix == 5) afficherUtilisateurs(base);
-        else if (choix == 6) afficherUtilisateursTriesParNom(base);
-        else if (choix == 7) afficherUtilisateursTriesParID(base);
-        else if (choix == 9) {
-            StatutUtilisateur s = chargerUtilisateurs(base, "test_utilisateurs.csv");
-            if (s == OK) printf("📂 Chargement réussi\n");
-            else printf("❌ Erreur dans le chargement (code %d)\n", s);
-        }
-        else if (choix == 8) {
-            StatutUtilisateur s = sauvegarderUtilisateurs(base, "test_utilisateurs.csv");
-            if (s == OK) printf("💾 Sauvegarde réussie\n");
-            else printf("❌ Erreur dans la sauvegarde (code %d)\n", s);
-        }
-
-    } while (choix != 0);
-    printf("👋 Fin du programme.\n");
-}
-
-// Utilisateurs
-
-
-
-// Vérifie si un utilisateur existe déjà (par ID)
 int existeUtilisateur(BaseUtilisateurs *base, int id) {
-    for (int i = 0; i < base->nbUtilisateurs; i++) {
-        if (base->utilisateurs[i].id == id)
-            return 1;
-    }
-    return 0;
+    return (rechercherUtilisateurParID(base, id) != NULL);
 }
 
-// Ajouter
 StatutUtilisateur ajouterUtilisateur(BaseUtilisateurs *base, Utilisateur u) {
-    if (base->nbUtilisateurs >= MAX_UTILISATEURS)
-        return BASE_PLEINE;
-    if (existeUtilisateur(base, u.id))
-        return UTILISATEUR_EXISTE;
+    if (!base) return BASE_PLEINE;
+    if (base->nbUtilisateurs >= MAX_UTILISATEURS) return BASE_PLEINE;
+    if (existeUtilisateur(base, u.id)) return UTILISATEUR_EXISTE;
+
+    // s'assurer que les chaines sont terminées
+    u.nom[sizeof(u.nom)-1] = '\0';
+    u.prenom[sizeof(u.prenom)-1] = '\0';
+    u.email[sizeof(u.email)-1] = '\0';
 
     base->utilisateurs[base->nbUtilisateurs++] = u;
     return OK;
 }
 
-// Modifier
 StatutUtilisateur modifierUtilisateur(BaseUtilisateurs *base, UpdateUtilisateur upd) {
-    for (int i = 0; i < base->nbUtilisateurs; i++) {
+    if (!base) return UTILISATEUR_INEXISTANT;
+    for (int i = 0; i < base->nbUtilisateurs; ++i) {
         if (base->utilisateurs[i].id == upd.id) {
-            if (strlen(upd.nom) > 0)
-                strcpy(base->utilisateurs[i].nom, upd.nom);
-            if (strlen(upd.prenom) > 0)
-                strcpy(base->utilisateurs[i].prenom, upd.prenom);
-            if (strlen(upd.email) > 0)
-                strcpy(base->utilisateurs[i].email, upd.email);
+            if (strlen(upd.nom) > 0) strncpy(base->utilisateurs[i].nom, upd.nom, sizeof(base->utilisateurs[i].nom)-1);
+            if (strlen(upd.prenom) > 0) strncpy(base->utilisateurs[i].prenom, upd.prenom, sizeof(base->utilisateurs[i].prenom)-1);
+            if (strlen(upd.email) > 0) strncpy(base->utilisateurs[i].email, upd.email, sizeof(base->utilisateurs[i].email)-1);
             return OK;
         }
     }
     return UTILISATEUR_INEXISTANT;
 }
 
-// Supprimer
 StatutUtilisateur supprimerUtilisateurParID(BaseUtilisateurs *base, int id) {
-    for (int i = 0; i < base->nbUtilisateurs; i++) {
+    if (!base) return UTILISATEUR_INEXISTANT;
+    for (int i = 0; i < base->nbUtilisateurs; ++i) {
         if (base->utilisateurs[i].id == id) {
-            for (int j = i; j < base->nbUtilisateurs - 1; j++)
+            for (int j = i; j < base->nbUtilisateurs - 1; ++j) {
                 base->utilisateurs[j] = base->utilisateurs[j + 1];
+            }
             base->nbUtilisateurs--;
             return OK;
         }
@@ -262,50 +172,57 @@ StatutUtilisateur supprimerUtilisateurParID(BaseUtilisateurs *base, int id) {
     return UTILISATEUR_INEXISTANT;
 }
 
-StatutUtilisateur sauvegarderUtilisateurs(BaseUtilisateurs *base, const char *filename) {
-    FILE *f = fopen(filename, "w");
-    if (!f) return BASE_PLEINE; // erreur ouverture fichier
+/* ---------- sauvegarde / chargement (CSV) ---------- */
 
-    for (int i = 0; i < base->nbUtilisateurs; i++) {
+StatutUtilisateur sauvegarderUtilisateurs(BaseUtilisateurs *base, const char *filename) {
+    if (!base || !filename) return BASE_PLEINE;
+    FILE *f = fopen(filename, "w");
+    if (!f) return BASE_PLEINE;
+
+    for (int i = 0; i < base->nbUtilisateurs; ++i) {
         fprintf(f, "%d,%s,%s,%s\n",
                 base->utilisateurs[i].id,
                 base->utilisateurs[i].nom,
                 base->utilisateurs[i].prenom,
                 base->utilisateurs[i].email);
     }
-
     fclose(f);
     return OK;
 }
 
 StatutUtilisateur chargerUtilisateurs(BaseUtilisateurs *base, const char *filename) {
+    if (!base || !filename) return BASE_PLEINE;
     FILE *f = fopen(filename, "r");
-    if (!f) return BASE_PLEINE; // fichier inexistant
+    if (!f) return BASE_PLEINE;
 
-    base->nbUtilisateurs = 0;
     char line[512];
+    base->nbUtilisateurs = 0;
+
     while (fgets(line, sizeof(line), f)) {
         if (base->nbUtilisateurs >= MAX_UTILISATEURS) break;
 
-        Utilisateur u;
-        char *token = strtok(line, ",");
-        if (!token) continue;
-        u.id = atoi(token);
+        Utilisateur u = {0};
+        char *tok = strtok(line, ",");
+        if (!tok) continue;
+        u.id = atoi(tok);
 
-        token = strtok(NULL, ",");
-        if (!token) continue;
-        strncpy(u.nom, token, sizeof(u.nom));
-        u.nom[strcspn(u.nom, "\n")] = 0;
+        tok = strtok(NULL, ",");
+        if (!tok) continue;
+        strncpy(u.nom, tok, sizeof(u.nom)-1);
+        u.nom[sizeof(u.nom)-1] = '\0';
+        u.nom[strcspn(u.nom, "\n")] = '\0';
 
-        token = strtok(NULL, ",");
-        if (!token) continue;
-        strncpy(u.prenom, token, sizeof(u.prenom));
-        u.prenom[strcspn(u.prenom, "\n")] = 0;
+        tok = strtok(NULL, ",");
+        if (!tok) continue;
+        strncpy(u.prenom, tok, sizeof(u.prenom)-1);
+        u.prenom[sizeof(u.prenom)-1] = '\0';
+        u.prenom[strcspn(u.prenom, "\n")] = '\0';
 
-        token = strtok(NULL, ",");
-        if (!token) continue;
-        strncpy(u.email, token, sizeof(u.email));
-        u.email[strcspn(u.email, "\n")] = 0;
+        tok = strtok(NULL, ",");
+        if (!tok) continue;
+        strncpy(u.email, tok, sizeof(u.email)-1);
+        u.email[sizeof(u.email)-1] = '\0';
+        u.email[strcspn(u.email, "\n")] = '\0';
 
         base->utilisateurs[base->nbUtilisateurs++] = u;
     }
@@ -314,5 +231,109 @@ StatutUtilisateur chargerUtilisateurs(BaseUtilisateurs *base, const char *filena
     return OK;
 }
 
+/* ---------- authentification admin (simple) ---------- */
+/* ADMIN_PASSWORD doit être défini dans utilisateur.h */
+int authentifierAdmin(void) {
+    char pass[128];
+    printf("Mot de passe administrateur : ");
+    if (scanf("%127s", pass) != 1) return 0;
+    // vider le \n restant
+    int c; while ((c = getchar()) != '\n' && c != EOF) {}
+#ifdef ADMIN_PASSWORD
+    if (strcmp(pass, ADMIN_PASSWORD) == 0) { printf("Authentification OK.\n"); return 1; }
+#endif
+    printf("Mot de passe incorrect (ou ADMIN_PASSWORD non défini).\n");
+    return 0;
+}
 
+/* ---------- Menu utilisateurs (console) ---------- */
+
+void menu_recherche(BaseUtilisateurs *base) {
+    if (!base) return;
+    int choix;
+    do {
+        printf("\n===== MENU GESTION UTILISATEURS =====\n");
+        printf("1. Ajouter un utilisateur\n");
+        printf("2. Modifier un utilisateur\n");
+        printf("3. Supprimer un utilisateur\n");
+        printf("4. Rechercher un utilisateur par nom\n");
+        printf("5. Lister tous les utilisateurs\n");
+        printf("6. Lister tries par nom\n");
+        printf("7. Lister tries par ID\n");
+        printf("8. Sauvegarder (CSV)\n");
+        printf("9. Charger (CSV)\n");
+        printf("0. Retour\n");
+        printf("Votre choix : ");
+
+        if (scanf("%d", &choix) != 1) {
+            // vider entrée
+            int ch;
+            while ((ch = getchar()) != '\n' && ch != EOF) {}
+            printf("Entree invalide.\n");
+            continue;
+        }
+        getchar(); // consomme '\n'
+
+        if (choix == 1) {
+            Utilisateur u = {0};
+            printf("ID : "); scanf("%d", &u.id); getchar();
+            printf("Nom : "); fgets(u.nom, sizeof(u.nom), stdin); trim(u.nom);
+            printf("Prenom : "); fgets(u.prenom, sizeof(u.prenom), stdin); trim(u.prenom);
+            printf("Email : "); fgets(u.email, sizeof(u.email), stdin); trim(u.email);
+
+            StatutUtilisateur status = ajouterUtilisateur(base, u);
+            if (status == OK) printf("✅ Utilisateur ajoute.\n");
+            else printf("❌ Erreur (code %d).\n", status);
+        }
+        else if (choix == 2) {
+            int id;
+            printf("ID à modifier : "); scanf("%d", &id); getchar();
+            Utilisateur *u = rechercherUtilisateurParID(base, id);
+            if (!u) { printf("Utilisateur introuvable.\n"); continue; }
+
+            UpdateUtilisateur upd = { .id = id, .nom = "", .prenom = "", .email = "" };
+
+            printf("Nouveau nom (laisser vide pour garder '%s') : ", u->nom);
+            fgets(upd.nom, sizeof(upd.nom), stdin); trim(upd.nom);
+
+            printf("Nouveau prénom (laisser vide pour garder '%s') : ", u->prenom);
+            fgets(upd.prenom, sizeof(upd.prenom), stdin); trim(upd.prenom);
+
+            printf("Nouvel email (laisser vide pour garder '%s') : ", u->email);
+            fgets(upd.email, sizeof(upd.email), stdin); trim(upd.email);
+
+            StatutUtilisateur s = modifierUtilisateur(base, upd);
+            if (s == OK) printf("✅ Modifié avec succès.\n");
+            else printf("❌ Erreur (code %d).\n", s);
+        }
+        else if (choix == 3) {
+            int id;
+            printf("ID à supprimer : "); scanf("%d", &id); getchar();
+            StatutUtilisateur s = supprimerUtilisateurParID(base, id);
+            if (s == OK) printf("✅ Supprimé.\n");
+            else printf("❌ Erreur (code %d).\n", s);
+        }
+        else if (choix == 4) {
+            char nom[128];
+            printf("Nom à rechercher : ");
+            fgets(nom, sizeof(nom), stdin); trim(nom);
+            rechercherUtilisateurParNom(base, nom);
+        }
+        else if (choix == 5) afficherUtilisateurs(base);
+        else if (choix == 6) afficherUtilisateursTriesParNom(base);
+        else if (choix == 7) afficherUtilisateursTriesParID(base);
+        else if (choix == 8) {
+            StatutUtilisateur s = sauvegarderUtilisateurs(base, "utilisateurs.csv");
+            if (s == OK) printf("💾 Sauvegarde reussie (utilisateurs.csv)\n");
+            else printf("❌ Erreur lors de la sauvegarde (code %d)\n", s);
+        }
+        else if (choix == 9) {
+            StatutUtilisateur s = chargerUtilisateurs(base, "utilisateurs.csv");
+            if (s == OK) printf("📂 Chargement reussi (utilisateurs.csv)\n");
+            else printf("❌ Erreur lors du chargement (code %d)\n", s);
+        }
+    } while (choix != 0);
+
+    printf("👋 Retour menu principal.\n");
+}
 
