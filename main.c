@@ -19,9 +19,8 @@ int main(void) {
     BaseUtilisateurs base = {0};
     BaseEmprunts base_emprunts = { .nbEmprunts = 0 };
 
-    initBibliotheque(&b);
+   // initBibliotheque(&b);
     chargerBibliotheque(&b, "livres_table.txt");
-
     // Charger utilisateurs
     chargerUtilisateurs(&base, "test_utilisateurs.csv");
 
