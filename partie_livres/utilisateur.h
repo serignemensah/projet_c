@@ -5,6 +5,7 @@
 #ifndef UTILISATEUR_H
 #define UTILISATEUR_H
 #define MAX_UTILISATEURS 100
+#include "bibliotheque.h"
 
 typedef struct {
     int id;
@@ -26,7 +27,7 @@ typedef struct {
 } UpdateUtilisateur;
 
 typedef enum {
-    OK = 0,
+    OK,
     UTILISATEUR_EXISTE,
     UTILISATEUR_INEXISTANT,
     BASE_PLEINE
@@ -50,4 +51,7 @@ void menu_recherche(BaseUtilisateurs *base);
 StatutUtilisateur sauvegarderUtilisateurs(BaseUtilisateurs *base, const char *filename);
 StatutUtilisateur chargerUtilisateurs(BaseUtilisateurs *base, const char *filename);
 int existeUtilisateur(BaseUtilisateurs *base, int id);
+
+int authentifierAdmin();
+
 #endif //UTILISATEUR_H

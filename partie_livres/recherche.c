@@ -45,6 +45,8 @@ void rechercherLivreParISBN(const Bibliotheque *b, const char *isbn) {
                    b->livres[i].auteur,
                    b->livres[i].annee,
                    b->livres[i].categorie);
+
+
             return;
         }
     }

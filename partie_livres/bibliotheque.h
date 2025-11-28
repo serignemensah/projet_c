@@ -1,8 +1,6 @@
-#ifndef GESTION_LIVRE_BIBLIOTHÈQUE_H
-#define GESTION_LIVRE_BIBLIOTHÈQUE_H
+
 #ifndef BIBLIOTHEQUE_H
 #define BIBLIOTHEQUE_H
-
 #include <stdbool.h>
 #include <stddef.h>
 
@@ -46,6 +44,8 @@ typedef struct {
     // 🆕 gestion des exemplaires
     int nb_exemplaires_total; /* nb d'exemplaires possédés */
     int nb_exemplaires_disponibles;/* nb d'exemplaires actuellement dispo */
+    int nb_Emprunts;
+
 } Livre;
 
 
@@ -103,4 +103,3 @@ void menu_livres(Bibliotheque* b);
 void freeBibliotheque(Bibliotheque *b);
 #endif /* BIBLIOTHEQUE_H */
 
-#endif //GESTION_LIVRE_BIBLIOTHÈQUE_H
