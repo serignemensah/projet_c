@@ -14,4 +14,6 @@ add_executable(ProjetInfo main.c
         partie_livres/statistiques.h
         partie_livres/utilisateur.c
         partie_livres/utilisateur.h
+        partie_livres/emprunt.c
+        partie_livres/emprunt.h
 )

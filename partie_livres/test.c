@@ -5,8 +5,8 @@
 #include "test.h"
 #include <stdio.h>
 #include <string.h>
-#include "bibliotheque.h"
 #include "recherche.h"
+#include "bibliotheque.h"
 
 // Déclarations des fonctions CRUD (si pas déjà dans un .h)
 StatutLivre initBibliotheque(Bibliotheque *b);
@@ -16,7 +16,7 @@ StatutLivre modifierLivre(Bibliotheque *b, const char *isbn, const UpdateLivre *
 void freeBibliotheque(Bibliotheque *b);
 
 #define ASSERT(msg, expr) \
-    printf("%s : %s\n", msg, (expr) ? " OK" : " FAIL")
+    printf("%s: %s\n", msg, (expr) ? " OK": " FAIL")
 
 int test_ajout() {
     printf("\n==== Test ajouterLivre ====\n");
@@ -32,6 +32,7 @@ int test_ajout() {
     ASSERT("Toujours 1 livre", b.nb == 1);
 
     freeBibliotheque(&b);
+    return 0;
 }
 
 int test_suppression() {
@@ -47,6 +48,7 @@ int test_suppression() {
     ASSERT("Suppression livre inexistant", supprimerLivre(&b, "000") == STATUT_NON_TROUVE);
 
     freeBibliotheque(&b);
+    return 0;
 }
 
 int test_modification() {
@@ -68,6 +70,7 @@ int test_modification() {
     ASSERT("Livre absent => erreur", modifierLivre(&b, "333", &u) == STATUT_NON_TROUVE);
 
     freeBibliotheque(&b);
+    return 0;
 }
 
 int test_recherche() {
@@ -96,4 +99,5 @@ int test_recherche() {
     rechercherLivreParTitre(&b, "xyz");
 
     freeBibliotheque(&b);
+    return 0;
 }

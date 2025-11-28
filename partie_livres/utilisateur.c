@@ -139,10 +139,10 @@ void menu_recherche(BaseUtilisateurs *base) {
         printf("Votre choix : ");
         scanf("%d", &choix);
         getchar(); // éviter le \n
-
         if (choix == 1) {
             Utilisateur u;
-            printf("ID : "); scanf("%d", &u.id); getchar();
+            printf("ID : ");
+            scanf("%d", &u.id); getchar();
             printf("Nom : "); fgets(u.nom, sizeof(u.nom), stdin); trim(u.nom);
             printf("Prénom : "); fgets(u.prenom, sizeof(u.prenom), stdin); trim(u.prenom);
             printf("Email : "); fgets(u.email, sizeof(u.email), stdin); trim(u.email);
@@ -176,7 +176,8 @@ void menu_recherche(BaseUtilisateurs *base) {
 
         else if (choix == 3) {
             int id;
-            printf("ID à supprimer : "); scanf("%d", &id); getchar();
+            printf("ID à supprimer : ");
+            scanf("%d", &id); getchar();
             StatutUtilisateur s = supprimerUtilisateurParID(base, id);
             if (s == OK) printf(" Supprimé.\n");
             else printf(" Erreur (code %d).\n", s);
@@ -202,7 +203,7 @@ void menu_recherche(BaseUtilisateurs *base) {
             StatutUtilisateur s = sauvegarderUtilisateurs(base, "test_utilisateurs.csv");
             if (s == OK) printf("💾 Sauvegarde réussie\n");
             else printf("❌ Erreur dans la sauvegarde (code %d)\n", s);
-        }P
+        }
 
     } while (choix != 0);
     printf("👋 Fin du programme.\n");

@@ -7,7 +7,7 @@
 #include "partie_livres/test.h"
 #include "partie_livres/statistiques.h"
 #include"partie_livres/utilisateur.h"
-
+#include"partie_livres/emprunt.h"
 
 
 void menu_principal(void) {
@@ -17,6 +17,7 @@ void menu_principal(void) {
 int main(void) {
     Bibliotheque b = {0};
     BaseUtilisateurs base = {0};
+    BaseEmprunts base_emprunts = { .nbEmprunts = 0 };
 
     initBibliotheque(&b);
     chargerBibliotheque(&b, "livres_table.txt");
@@ -32,6 +33,7 @@ int main(void) {
         printf("========================================\n");
         printf(" 1. Gestion des livres\n");
         printf(" 2. Gestion des utilisateurs\n");
+        printf(" 3. Gestion des emprunts\n");
         printf(" 0. Quitter\n");
         printf("----------------------------------------\n");
         printf("Votre choix : ");
@@ -54,10 +56,14 @@ int main(void) {
             menu_recherche(&base);
             break;
 
+            case 3:
+                afficherMenuEmprunt(&base_emprunts);
+              break;
         case 0:
             printf("Au revoir !\n");
             sauvegarderBibliothequeTable(&b, "livres_table.txt");
             sauvegarderUtilisateurs(&base, "test_utilisateurs.csv");
+            sauvegarderEmprunts(&base_emprunts,"test_emprunts.csv");
             break;
 
         default:
