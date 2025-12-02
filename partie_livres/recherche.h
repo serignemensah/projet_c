@@ -14,7 +14,10 @@
 #define TITRE_LEN 128
 #define AUTEUR_LEN 96
 #define CATEGORIE_LEN 48
-
+#define ISBN_LEN 18 /* ex: "978-2-07-036822-8" */
+#define TITRE_LEN 128
+#define AUTEUR_LEN 96
+#define CATEGORIE_LEN 48
 /* Disponibilité / état d'un livre */
 typedef enum {
     LIVRE_DISPONIBLE = 0,
@@ -103,7 +106,7 @@ void afficherTousLesLivresTable(const Bibliotheque *b);
 StatutLivre sauvegarderBibliothequeTable(const Bibliotheque *b, const char *filename);
 
 
-void menu_livres(Bibliotheque* b);
+void menu_livres(Bibliotheque* b,int role);
 StatutLivre setDisponibiliteLivre(Bibliotheque *b, const char *isbn, Disponibilite d);
 
 
@@ -120,5 +123,30 @@ void afficherDisponibiliteLivre(const Bibliotheque *b, const char *isbn);
 StatutLivre setDisponibiliteLivre(Bibliotheque *b, const char *isbn, Disponibilite d);
 void afficherLivresDuneAnnee(const Bibliotheque *b, int annee);
 
+StatutLivre ajouterLivre(Bibliotheque *b, const Livre *livre);
 
+StatutLivre supprimerLivre(Bibliotheque *b, const char *isbn);
+
+StatutLivre modifierLivre(Bibliotheque *b, const char *isbn, const UpdateLivre *u);
+
+StatutLivre initBibliotheque(Bibliotheque *b);
+
+
+StatutLivre chargerBibliotheque(Bibliotheque *b, const char *filename);
+
+int getNbExemplairesDisponibles(const Bibliotheque *b, const char *isbn);
+StatutLivre emprunterExemplaire(Bibliotheque *b, const char *isbn);
+StatutLivre retournerExemplaire(Bibliotheque *b, const char *isbn);
+
+
+void afficherEnteteTable();
+void afficherTousLesLivresTable(const Bibliotheque *b);
+StatutLivre sauvegarderBibliothequeTable(const Bibliotheque *b, const char *filename);
+
+
+void menu_livres(Bibliotheque* b, int role);
+StatutLivre setDisponibiliteLivre(Bibliotheque *b, const char *isbn, Disponibilite d);
+
+
+void freeBibliotheque(Bibliotheque *b);
 #endif //RECHERCHE_H

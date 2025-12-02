@@ -3,7 +3,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "recherche.h"
-
+#include "utilisateur.h"
 
 /* Bornes valides de l'année */
 #define ANNEE_MIN 1450
@@ -241,7 +241,7 @@ void afficherTousLesLivresTable(const Bibliotheque *b) {
 /* -------------------- SAUVEGARDE TABLE -------------------- */
 
 StatutLivre sauvegarderBibliotheque(const Bibliotheque *b, const char *filename) {
-    FILE *f = fopen(filename, "w");
+    FILE *f = fopen(filename, "a");
     if (!f) return STATUT_INTERNE;
 
     for (size_t i = 0; i < b->nb; i++) {
@@ -264,6 +264,76 @@ StatutLivre sauvegarderBibliotheque(const Bibliotheque *b, const char *filename)
 
 /* Pas encore implémenté → OK */
 StatutLivre chargerBibliotheque(Bibliotheque *b, const char *filename) {
+    FILE *f = fopen(filename, "r");
+    if (!f) {
+        // Pas grave si le fichier n'existe pas encore : on considère b vide
+        b->nb = 0;
+        return STATUT_OK;
+    }
+
+    b->nb = 0;  // on repart de zéro
+
+    char ligne[512];
+    while (fgets(ligne, sizeof(ligne), f)) {
+
+        if (b->nb >= b->capacite) {
+            // si tu as ensure_capacity, utilise-le :
+            // if (ensure_capacity(b, b->nb + 1) != STATUT_OK) break;
+            break; // version simple : on arrête si c'est plein
+        }
+
+        Livre l;
+        char *token;
+
+        // isbn
+        token = strtok(ligne, "|");
+        if (!token) continue;
+        strncpy(l.isbn, token, ISBN_LEN);
+        l.isbn[ISBN_LEN-1] = '\0';
+
+        // titre
+        token = strtok(NULL, "|");
+        if (!token) continue;
+        strncpy(l.titre, token, TITRE_LEN);
+        l.titre[TITRE_LEN-1] = '\0';
+
+        // auteur
+        token = strtok(NULL, "|");
+        if (!token) continue;
+        strncpy(l.auteur, token, AUTEUR_LEN);
+        l.auteur[AUTEUR_LEN-1] = '\0';
+
+        // annee
+        token = strtok(NULL, "|");
+        if (!token) continue;
+        l.annee = atoi(token);
+
+        // categorie
+        token = strtok(NULL, "|");
+        if (!token) continue;
+        strncpy(l.categorie, token, CATEGORIE_LEN);
+        l.categorie[CATEGORIE_LEN-1] = '\0';
+
+        // dispo
+        token = strtok(NULL, "|");
+        if (!token) continue;
+        l.dispo = (Disponibilite)atoi(token);
+
+        // nb_exemplaires_total
+        token = strtok(NULL, "|");
+        if (!token) continue;
+        l.nb_exemplaires_total = atoi(token);
+
+        // nb_exemplaires_disponibles
+        token = strtok(NULL, "|");
+        if (!token) continue;
+        l.nb_exemplaires_disponibles = atoi(token);
+
+        // on ajoute le livre dans la biblio
+        b->livres[b->nb++] = l;
+    }
+
+    fclose(f);
     return STATUT_OK;
 }
 
@@ -275,14 +345,14 @@ void freeBibliotheque(Bibliotheque *b) {
     b->nb       = 0;
     b->capacite = 0;
 }
-void menu_livres(Bibliotheque *b)
+void menu_livres(Bibliotheque *b,int r)
 {
+    chargerBibliotheque(b,"livres.txt");
     int choix;
     char buffer[256];
     char isbn[ISBN_LEN];
     char input[256];
     int annee = 0;
-
     do {
         printf("\n=========== MENU LIVRES ===========\n");
         printf(" 1. Ajouter un livre\n");
@@ -316,45 +386,52 @@ void menu_livres(Bibliotheque *b)
         switch (choix)
         {
         case 1:
-            printf("ISBN : ");
-            fgets(l.isbn, sizeof(l.isbn), stdin);
+            if (r!=ROLE_ADMIN) {
+                printf("⚠️ Accès refusé : réservé à l'administrateur.\n");
+                break;
+            }
+                printf("ISBN : ");
+                fgets(l.isbn, sizeof(l.isbn), stdin);
 
-            printf("Titre : ");
-            fgets(l.titre, sizeof(l.titre), stdin);
+                printf("Titre : ");
+                fgets(l.titre, sizeof(l.titre), stdin);
 
-            printf("Auteur : ");
-            fgets(l.auteur, sizeof(l.auteur), stdin);
+                printf("Auteur : ");
+                fgets(l.auteur, sizeof(l.auteur), stdin);
 
-            printf("Categorie : ");
-            fgets(l.categorie, sizeof(l.categorie), stdin);
+                printf("Categorie : ");
+                fgets(l.categorie, sizeof(l.categorie), stdin);
 
-            printf("Année : ");
-            scanf("%d", &l.annee);
-            getchar();
+                printf("Année : ");
+                scanf("%d", &l.annee);
+                getchar();
 
-            int nb_ex;
-            printf("Nombre d'exemplaires : ");
-            scanf("%d", &nb_ex);
-            getchar();
+                int nb_ex;
+                printf("Nombre d'exemplaires : ");
+                scanf("%d", &nb_ex);
+                getchar();
 
-            if (nb_ex <= 0) nb_ex = 1;
+                 if  (nb_ex <= 0) nb_ex = 1;
 
-            l.isbn[strcspn(l.isbn, "\n")] = 0;
-            l.titre[strcspn(l.titre, "\n")] = 0;
-            l.auteur[strcspn(l.auteur, "\n")] = 0;
-            l.categorie[strcspn(l.categorie, "\n")] = 0;
+                l.isbn[strcspn(l.isbn, "\n")] = 0;
+                l.titre[strcspn(l.titre, "\n")] = 0;
+                l.auteur[strcspn(l.auteur, "\n")] = 0;
+                l.categorie[strcspn(l.categorie, "\n")] = 0;
 
-            l.nb_exemplaires_total       = nb_ex;
-            l.nb_exemplaires_disponibles = nb_ex;
-            l.dispo                      = LIVRE_DISPONIBLE;
+                l.nb_exemplaires_total       = nb_ex;
+                l.nb_exemplaires_disponibles = nb_ex;
+                l.dispo                      = LIVRE_DISPONIBLE;
 
-            if (ajouterLivre(b, &l) == STATUT_OK)
-                printf(" Livre ajouté.\n");
-            else
-                printf(" Erreur lors de l’ajout.\n");
-            break;
+                if (ajouterLivre(b, &l) == STATUT_OK)
+                    printf(" Livre ajouté.\n");
+                else
+                    printf(" Erreur lors de l’ajout.\n");
+                break;
 
         case 2:
+                if (r!= ROLE_ADMIN){      printf("⚠️ Accès refusé : réservé à l'administrateur.\n");
+                    break;
+                }
             printf("ISBN du livre à supprimer : ");
             fgets(isbn, sizeof(isbn), stdin);
             isbn[strcspn(isbn, "\n")] = 0;
@@ -366,6 +443,10 @@ void menu_livres(Bibliotheque *b)
             break;
 
         case 3:
+                if (r != ROLE_ADMIN) {
+                    printf("⚠️ Accès refusé : réservé à l'administrateur.\n");
+                    break;
+                }
             printf("ISBN du livre à modifier : ");
             fgets(isbn, sizeof(isbn), stdin);
             isbn[strcspn(isbn, "\n")] = 0;

@@ -5,7 +5,8 @@
 #ifndef UTILISATEUR_H
 #define UTILISATEUR_H
 #define MAX_UTILISATEURS 100
-#include "bibliotheque.h"
+
+#define ADMIN_PASSWORD "2002"
 
 typedef struct {
     int id;
@@ -32,6 +33,13 @@ typedef enum {
     UTILISATEUR_INEXISTANT,
     BASE_PLEINE
 } StatutUtilisateur;
+typedef enum {
+    ROLE_ADMIN = 1,
+    ROLE_UTILISATEUR = 2,
+
+} UserRole;
+
+int Admin(Utilisateur *u);
 
 // Prototypes CRUD
 StatutUtilisateur ajouterUtilisateur(BaseUtilisateurs *base, Utilisateur u);
@@ -46,12 +54,11 @@ void rechercherUtilisateurParNom(BaseUtilisateurs *base, const char *nom);
 void afficherUtilisateurs(BaseUtilisateurs *base);
 void afficherUtilisateursTriesParNom(BaseUtilisateurs *base);
 void afficherUtilisateursTriesParID(BaseUtilisateurs *base);
-void menu_recherche(BaseUtilisateurs *base);
+void menu_recherche(BaseUtilisateurs *base, int role);
 // Persistance
 StatutUtilisateur sauvegarderUtilisateurs(BaseUtilisateurs *base, const char *filename);
 StatutUtilisateur chargerUtilisateurs(BaseUtilisateurs *base, const char *filename);
 int existeUtilisateur(BaseUtilisateurs *base, int id);
 
-int authentifierAdmin();
 
 #endif //UTILISATEUR_H
