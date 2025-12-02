@@ -4,7 +4,7 @@
 
 #ifndef STATISTIQUES_H
 #define STATISTIQUES_H
-#include "bibliotheque.h"
+#include "recherche.h"
 int compterTotalLivres(const Bibliotheque *b);
 int compterLivresParStatut(const Bibliotheque *b, Disponibilite d);
 int compterLivresDisponibles(const Bibliotheque *b);

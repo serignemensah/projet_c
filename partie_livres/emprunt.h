@@ -1,7 +1,7 @@
 #ifndef EMPRUNT_H
 #define EMPRUNT_H
 
-#include "bibliotheque.h"
+#include "recherche.h"
 #include "utilisateur.h"
 
 

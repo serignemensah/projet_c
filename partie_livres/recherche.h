@@ -80,6 +80,7 @@ typedef struct {
     size_t nb; /* nombre d'éléments utilisés */
     size_t capacite; /* taille allouée (en Livres) */
 } Bibliotheque;
+
 StatutLivre ajouterLivre(Bibliotheque *b, const Livre *livre);
 
 StatutLivre supprimerLivre(Bibliotheque *b, const char *isbn);
