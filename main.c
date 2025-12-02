@@ -2,6 +2,8 @@
 #include "partie_livres/recherche.h"
 #include "partie_livres/emprunt.h"
 #include "partie_livres/utilisateur.h"
+
+
 #include <stdlib.h>
 int main() {
 
@@ -35,7 +37,6 @@ int main() {
     } while (choix != 0);
 
     sauvegarderToutesDonnees(&b, &bu, &be);
-    free(b.livres);
 
     return 0;
 }

@@ -241,7 +241,7 @@ void afficherTousLesLivresTable(const Bibliotheque *b) {
 /* -------------------- SAUVEGARDE TABLE -------------------- */
 
 StatutLivre sauvegarderBibliotheque(const Bibliotheque *b, const char *filename) {
-    FILE *f = fopen(filename, "w");
+    FILE *f = fopen(filename, "a");
     if (!f) return STATUT_INTERNE;
 
     for (size_t i = 0; i < b->nb; i++) {
@@ -264,6 +264,76 @@ StatutLivre sauvegarderBibliotheque(const Bibliotheque *b, const char *filename)
 
 /* Pas encore implémenté → OK */
 StatutLivre chargerBibliotheque(Bibliotheque *b, const char *filename) {
+    FILE *f = fopen(filename, "r");
+    if (!f) {
+        // Pas grave si le fichier n'existe pas encore : on considère b vide
+        b->nb = 0;
+        return STATUT_OK;
+    }
+
+    b->nb = 0;  // on repart de zéro
+
+    char ligne[512];
+    while (fgets(ligne, sizeof(ligne), f)) {
+
+        if (b->nb >= b->capacite) {
+            // si tu as ensure_capacity, utilise-le :
+            // if (ensure_capacity(b, b->nb + 1) != STATUT_OK) break;
+            break; // version simple : on arrête si c'est plein
+        }
+
+        Livre l;
+        char *token;
+
+        // isbn
+        token = strtok(ligne, "|");
+        if (!token) continue;
+        strncpy(l.isbn, token, ISBN_LEN);
+        l.isbn[ISBN_LEN-1] = '\0';
+
+        // titre
+        token = strtok(NULL, "|");
+        if (!token) continue;
+        strncpy(l.titre, token, TITRE_LEN);
+        l.titre[TITRE_LEN-1] = '\0';
+
+        // auteur
+        token = strtok(NULL, "|");
+        if (!token) continue;
+        strncpy(l.auteur, token, AUTEUR_LEN);
+        l.auteur[AUTEUR_LEN-1] = '\0';
+
+        // annee
+        token = strtok(NULL, "|");
+        if (!token) continue;
+        l.annee = atoi(token);
+
+        // categorie
+        token = strtok(NULL, "|");
+        if (!token) continue;
+        strncpy(l.categorie, token, CATEGORIE_LEN);
+        l.categorie[CATEGORIE_LEN-1] = '\0';
+
+        // dispo
+        token = strtok(NULL, "|");
+        if (!token) continue;
+        l.dispo = (Disponibilite)atoi(token);
+
+        // nb_exemplaires_total
+        token = strtok(NULL, "|");
+        if (!token) continue;
+        l.nb_exemplaires_total = atoi(token);
+
+        // nb_exemplaires_disponibles
+        token = strtok(NULL, "|");
+        if (!token) continue;
+        l.nb_exemplaires_disponibles = atoi(token);
+
+        // on ajoute le livre dans la biblio
+        b->livres[b->nb++] = l;
+    }
+
+    fclose(f);
     return STATUT_OK;
 }
 
@@ -277,6 +347,7 @@ void freeBibliotheque(Bibliotheque *b) {
 }
 void menu_livres(Bibliotheque *b)
 {
+    chargerBibliotheque(b,"livres.txt");
     int choix;
     char buffer[256];
     char isbn[ISBN_LEN];
