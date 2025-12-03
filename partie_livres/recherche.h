@@ -45,15 +45,14 @@ typedef struct {
     char isbn[ISBN_LEN]; /* Unique dans la bibliothèque */
     char titre[TITRE_LEN];
     char auteur[AUTEUR_LEN];
-    int annee; /* ex: 1450..2100 */
-    char categorie[CATEGORIE_LEN]; /* ex: "Roman", "Informatique" */
-    Disponibilite dispo; /* état global : dispo, perdu, HS, etc. */
+    int annee;
+    char categorie[CATEGORIE_LEN];
+    Disponibilite dispo;
 
     // 🆕 gestion des exemplaires
-    int nb_exemplaires_total; /* nb d'exemplaires possédés */
-    int nb_exemplaires_disponibles;/* nb d'exemplaires actuellement dispo */
+    int nb_exemplaires_total;
+    int nb_exemplaires_disponibles;
     int nb_Emprunts;
-
 } Livre;
 
 
